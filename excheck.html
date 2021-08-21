@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="excheck.css">
+    <link rel="icon" href="Images/logo.png">
+    <title>Fruit-Checker</title>
+    <style type="text/css">
+        footer{
+            position: absolute;
+            bottom: 0;
+            right: 0
+        }
+        *{
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Titillium Web', sans-serif;
+    font-weight: 600;
+}
+
+.title{
+    font-family: 'Titillium Web', sans-serif;
+    padding-left: 10px;
+}
+
+#brand{
+    font-weight: 700;
+    font-family: 'Rubik';
+}
+
+#detect{
+    font-weight: 600;
+}
+
+body{
+    background: rgb(91, 172, 172); 
+    background-size: cover;
+        
+}
+.yellow{
+    color: #d38c09;
+}
+.red{
+    color: rgb(156, 34, 61);
+}
+.orange{
+    color:rgb(230, 105, 3);
+}
+
+p{
+    font-size: 1.2em;
+    font-weight: 400;
+    color: teal;
+}
+#main{
+    margin-top: 40px;
+}
+@media (min-width: 992px) {
+    #inputimg{
+        width: 60%;
+    }
+    #main{
+        margin-top: 60px;
+    }
+}
+.back {
+    font-size: 25px;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 3px solid thistle;
+    color: thistle;
+    text-align: center;
+    margin: 5px;
+}
+.ba {
+    margin-top: 0px;
+    color: thistle;
+}
+.back:hover {
+    font-size: 25px;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 3px solid teal;
+    color: teal;
+    text-align: center;
+    margin: 5px;
+}
+.ba:hover {
+    margin-top: 0px;
+    color: teal;
+}
+a {
+    text-decoration: none;
+}
+
+    </style>
+</head>
+
+<body>
+    
+<div class="back">
+    <a href="page.html">
+    <p class="ba">X</p>
+</a>
+</div>
+    <div class="container" id="main">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
+                <div class="card m-4">
+                    <div style="background:thistle; outline: none;" class="card-body" id="box-cont">
+                        <h3 class="card-title py-3 title" id="detect">Detect what exercise you, or someone else, is doing!
+                        </h3>
+                        <p class="px-3">
+                            To find out what exercise someone is doing, either use your camera and show the exercise
+                            or upload an image from your device. Do the same if you want to know whether you are correctly
+                            doing an exercise. If it does not recognise you, then you are likely doing it wrong! Check out the <span class="red">Exercise
+                            Tracker</span> page for live feedback on how you are doing your workout!
+                        </p>
+                        <label for="webcam" class="ps-3 pt-3 pb-3">USE WEBCAM:</label>
+                        <button id="webcam" type="button" class="btn btn-outline-secondary ms-3"
+                            onclick="useWebcam()">Start
+                            webcam</button><br />
+                        <label class="p-3" for="fruitimg">UPLOAD IMAGE:</label>
+                        <div class="input-group px-3 pb-3" id="inputimg">
+                            <input type="file" class="form-control" accept="image/*" id="fruitimg">
+                            <button class="btn btn-outline-secondary" id="loadBtn">Load</button>
+                        </div>
+                        <div id="webcam-container" class="px-3"></div>
+                        <div id="uploadedImage" class="px-3"></div>
+                        <div id="label-container" class="px-3 pt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+        <script src=https://unpkg.com/parse/dist/parse.min.js></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="excheck.js"></script>
+        <script>
+            Parse.initialize(
+  "6aYsAMNavhrLvau5OKnqgSyUKh9QP3rLqFjREAFN",
+  "Yc35FbFxWRbcCZccGoNFfHMRLjr3qU9MTRhFIPFN"
+);
+Parse.serverURL = 'https://pg-app-bh8zjd9ilqrzxtquj0tt3cpbyv71q2.scalabl.cloud/1/';
+
+const URL = "https://teachablemachine.withgoogle.com/models/yOhY0DUAL/";
+
+let model, webcam, newlabel, canvas, labelContainer, maxPredictions, camera_on = false, image_upload = false;
+
+function useWebcam() {
+    camera_on = !camera_on;
+
+    if (camera_on) {
+        init();
+        document.getElementById("webcam").innerHTML = "Close Webcam";
+    }
+    else {
+        stopWebcam();
+        document.getElementById("webcam").innerHTML = "Start Webcam";
+    }
+}
+
+async function stopWebcam() {
+    await webcam.stop();
+    document.getElementById("webcam-container").removeChild(webcam.canvas);
+    labelContainer.removeChild(newlabel);
+}
+
+// Load the image model and setup the webcam
+async function init() {
+
+    const modelURL = URL + "model.json";
+    const metadataURL = URL + "metadata.json";
+
+    // load the model and metadata
+    model = await tmImage.load(modelURL, metadataURL);
+    maxPredictions = model.getTotalClasses();
+
+    // Convenience function to setup a webcam
+    const flip = true; // whether to flip the webcam
+    webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+    await webcam.setup(); // request access to the webcam
+    await webcam.play();
+    window.requestAnimationFrame(loop);
+
+    // append element to the DOM
+    document.getElementById("webcam-container").appendChild(webcam.canvas);
+
+    newlabel = document.createElement("div");
+    labelContainer = document.getElementById("label-container");
+    labelContainer.appendChild(newlabel);
+}
+
+async function loop() {
+    webcam.update(); // update the webcam frame
+    await predict(webcam.canvas);
+    window.requestAnimationFrame(loop);
+}
+
+// run the image through the image model
+async function predict(input) {
+    // predict can take in an image, video or canvas html element
+    const prediction = await model.predict(input);
+
+    var highestVal = 0.00;
+    var bestClass = "";
+    result = document.getElementById("label-container");
+    for (let i = 0; i < maxPredictions; i++) {
+        var classPrediction = prediction[i].probability.toFixed(2);
+        if (classPrediction > highestVal) {
+            highestVal = classPrediction;
+            bestClass = prediction[i].className;
+        }
+    }
+
+    if (bestClass == "Squat" || bestClass == "leg raise" || bestClass == "Crunch") {
+        newlabel.className = "alert alert-success";
+    }
+    else {
+        newlabel.className = "alert alert-primary";
+    }
+
+    newlabel.innerHTML = bestClass + "; if you are unsure about how to do this exercise, or want guidance, check out the Ask Jimmy page!";
+}
+
+async function getPredictions() {
+
+    canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d");
+    canvas.width = "224";
+    canvas.height = "224";
+    context.drawImage(img, 0, 0);
+    document.getElementById("uploadedImage").appendChild(canvas);
+
+    newlabel = document.createElement("div");
+    labelContainer = document.getElementById("label-container");
+    labelContainer.appendChild(newlabel);
+
+    await predict(canvas);
+}
+
+
+$(document).ready(function () {
+    $("#loadBtn").on("click", async function () {
+
+        labelContainer = document.getElementById("label-container");
+
+        image_upload = !image_upload;
+
+        if (!image_upload) {
+            labelContainer.removeChild(newlabel);
+            document.getElementById("uploadedImage").removeChild(canvas);
+        }
+
+        const fileUploadControl = $("#fruitimg")[0];
+        if (fileUploadControl.files.length > 0) {
+
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            // load the model and metadata
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+            const file = fileUploadControl.files[0];
+
+            const name = "photo.jpg";
+            const parseFile = new Parse.File(name, file);
+
+            parseFile.save().then(async function () {
+                //The file has been saved to the Parse server
+
+                img = new Image(224, 224);
+                img.crossOrigin = "Anonymous";
+                img.addEventListener("load", getPredictions, false);
+                img.src = parseFile.url();
+
+            }, function (error) {
+                // The file either could not be read, or could not be saved to Parse.
+                result.innerHTML = "Uploading your image failed!";
+            });
+        }
+        else {
+            result.innerHTML = "Try Again!";
+        }
+    });
+});
+        </script>
+
+</body>
+
+</html>
