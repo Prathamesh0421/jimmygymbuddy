@@ -61,6 +61,25 @@
             background-color: thistle;
             border: 2px solid teal;
         }
+              ul.share-buttons{
+  list-style: none;
+  padding: 0;
+}
+
+ul.share-buttons li{
+  display: inline;
+}
+
+ul.share-buttons .sr-only{
+  position: absolute;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+}
         
     </style>
   </head>
@@ -69,9 +88,11 @@
     <h1>Go you!</h1>
     <h3>You have completed your mini-workout with impeccable technique.</h3>
     <p>Share your achievement online:
-        <div class="twitter">
-        <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Jimmy%20Gym%20Buddy%20is%20the%20best!" data-size="large"><i style="color: white; padding: 5px; font-size: 30px;" class='bx bxl-twitter' ></i></a>
-    </div>
+        <ul class="share-buttons" data-source="simplesharingbuttons.com">
+            <li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Ferxn-mcg.github.io%2Fjimmygymbuddy%2F&quote=Jimmy%20Gym%20Buddy" target="_blank" title="Share on Facebook"><i class="fab fa-facebook-square fa-2x" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a></li>
+            <li><a href="https://twitter.com/intent/tweet?source=https%3A%2F%2Ferxn-mcg.github.io%2Fjimmygymbuddy%2F&text=Jimmy%20Gym%20Buddy:%20https%3A%2F%2Ferxn-mcg.github.io%2Fjimmygymbuddy%2F" target="_blank" title="Tweet"><i class="fab fa-twitter-square fa-2x" aria-hidden="true"></i><span class="sr-only">Tweet</span></a></li>
+            <li><a href="mailto:?subject=Jimmy%20Gym%20Buddy&body=I%20completed%20my%20workout%20%20with%20Jimmy%20Gym%20Buddy!:%20https%3A%2F%2Ferxn-mcg.github.io%2Fjimmygymbuddy%2F" target="_blank" title="Send email"><i class="fas fa-envelope-square fa-2x" aria-hidden="true"></i><span class="sr-only">Send email</span></a></li>
+          </ul>
     <a href="exercise.html"><button class="nav">Do Another!</button></a>
     <a href="page.html"><button class="nav">Go home</button></a>
     </p>
